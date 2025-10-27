@@ -75,7 +75,7 @@ public class UserController {
             return  ResponseEntity.status(HttpStatus.OK).body(new UserResponse<>(allUser,"Fetch All User"));
 
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new UserResponse<>(null,"No User Found"));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new UserResponse<>(null,"No User Found"));
 
 
 

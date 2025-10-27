@@ -55,6 +55,7 @@ public class TaskController {
     public ResponseEntity<TaskResponse<DailyTask>> updateTaskByID(@RequestBody DailyTask dailyTask, @PathVariable("id") Long id ){
 
         Optional<DailyTask> task  = taskService.getById(id);
+
         if(task.isPresent()){
             DailyTask oldTask =  task.get();
             oldTask.setTask(dailyTask.getTask());
