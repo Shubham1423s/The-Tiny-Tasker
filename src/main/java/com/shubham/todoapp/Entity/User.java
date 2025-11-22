@@ -6,11 +6,10 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.lang.NonNull;
+import lombok.*;
 import org.springframework.stereotype.Indexed;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,22 +23,29 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Task cannot be blank")
-    // this will throw an exception and we have to handle the exception using exception handling
-   @Column(unique = true,nullable = false)
-    // for this to execute we have to explicitly tell database to store only unique  values
-    // with telling this will not work
-
+    @NotBlank(message = "First Name  cannot be blank")
+    @Column(nullable = false)
     private   String firstName;
 
-  private   String lastName;
+    private   String lastName;
+    @NotBlank(message = "Password can not be blank ")
+    @Column(nullable = false)
+    private  String password;
+
     @Email(message = "must be a valid email")
     @Column(unique = true,nullable = false)
+     private String email;
 
-   private String email;
+    @Column(nullable = false)
+//     private String role = "USER";// default role is  user
+
+    private List<String> roles;
+     // here take string in place of list just to simple things later we can make changes as we need
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<DailyTask> tasks;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DailyTask> tasks = new ArrayList<>();
+
+
 
 }

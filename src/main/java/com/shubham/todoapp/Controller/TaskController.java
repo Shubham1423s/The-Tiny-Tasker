@@ -2,8 +2,10 @@ package com.shubham.todoapp.Controller;
 
 import com.shubham.todoapp.Dto.TaskResponse;
 import com.shubham.todoapp.Entity.DailyTask;
+import com.shubham.todoapp.Entity.User;
 import com.shubham.todoapp.Repository.TaskRepo;
 import com.shubham.todoapp.Service.TaskService;
+import com.shubham.todoapp.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,9 @@ public class TaskController {
 
     @Autowired
     TaskService taskService;
+
+    @Autowired
+    UserService userService;
 
     @GetMapping("/fetchTask/{id}")
     public ResponseEntity<TaskResponse<DailyTask>> getTaksByID(@PathVariable("id")  Long id){
@@ -59,7 +64,7 @@ public class TaskController {
         if(task.isPresent()){
             DailyTask oldTask =  task.get();
             oldTask.setTask(dailyTask.getTask());
-            taskService.saveTask(oldTask);
+//            taskService.saveTask(oldTask);
 
 
             return ResponseEntity.status(HttpStatus.OK).body(new TaskResponse<>(oldTask,"Task Updated"));
@@ -90,6 +95,7 @@ public class TaskController {
 
     @PostMapping("/saveTask")
     public ResponseEntity<TaskResponse<DailyTask>> createTask(@RequestBody DailyTask task){
+
        taskService.saveTask(task);
        return  ResponseEntity.status(HttpStatus.CREATED).body(new TaskResponse<>(task,"Task Created Successfully"));
 

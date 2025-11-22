@@ -18,12 +18,12 @@ public class DailyTask {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true,nullable = false)
-    @NotBlank(message = "Invalid Task")
-    private   String task;
+    @NotBlank(message = "Task can not be blank")
+    @Column(nullable = false)
+    private  String task;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
 

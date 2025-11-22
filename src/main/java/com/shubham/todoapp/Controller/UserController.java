@@ -66,20 +66,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/AllUser")
-    public ResponseEntity<UserResponse<List<User>>> AllUser(){
 
-
-        List<User> allUser = userService.getAllUser();
-        if(allUser != null && !allUser.isEmpty()){
-            return  ResponseEntity.status(HttpStatus.OK).body(new UserResponse<>(allUser,"Fetch All User"));
-
-        }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new UserResponse<>(null,"No User Found"));
-
-
-
-    }
 
     @GetMapping("/fetchUser/{id}")
     public ResponseEntity<UserResponse<User>> getUserById(@PathVariable("id") Long id){
@@ -95,6 +82,22 @@ public class UserController {
         }
 
 
+
+    }
+    @GetMapping("/findByuserName/{name}")
+    public ResponseEntity<UserResponse<User>> getByUserNamee(@PathVariable ("name") String name){
+
+    User user = userService.findByUserName(name);
+
+        if(user != null ){
+            return  ResponseEntity.status(HttpStatus.OK).body(new UserResponse<>(user,"user Found"));
+
+
+
+        }else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new UserResponse<>(null,"User Not Found"));
+
+        }
 
     }
 
