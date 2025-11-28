@@ -9,8 +9,10 @@ import java.util.List;
 
 public interface UserRepo extends JpaRepository<User, Long> {
 
-    User   findByFirstName(String firstname);
-    User   deleteByFirstName(String firstname);
+    User   findByFirstName(String firstName);
+    User   deleteByFirstName(String firstName);
+    boolean existsByFirstName(String userName);
+    // later we will fix for email also and that time i will do it also with workbench
 
 
 

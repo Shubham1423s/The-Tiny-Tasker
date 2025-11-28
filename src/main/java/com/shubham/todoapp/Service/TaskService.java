@@ -7,55 +7,64 @@ import com.shubham.todoapp.Repository.TaskRepo;
 import com.shubham.todoapp.Repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.config.Task;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.security.PrivateKey;
 import java.util.List;
 import java.util.Optional;
+import java.util.PriorityQueue;
 
 @Service
 public class TaskService {
 
     @Autowired
-    TaskRepo taskRepo;
+   private TaskRepo taskRepo;
 
     @Autowired
-    UserService userService;
+   private UserService userService;
+
+    @Autowired
+    private UserRepo userRepo;
+
+
 
 
     public List<DailyTask> getAll(){
-        return taskRepo.findAll();
+
+        Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+
+        User user = userRepo.findByFirstName(userName);
+
+        List<DailyTask> allTask = taskRepo.findByUser(user);
+
+        return allTask;
+
     }
 
 
-    public  void  saveTask(DailyTask dailyTask){
-         taskRepo.save(dailyTask);
+    public  DailyTask  saveTask(DailyTask dailyTask){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+
+        User user = userRepo.findByFirstName(userName);
+        dailyTask.setUser(user);
+        return taskRepo.save(dailyTask);
     }
-//public  void  saveTask(DailyTask dailyTask,String userName){
-//        try {
-//            User user  = userService.findByUserName(userName);
-//
-//            DailyTask task = taskRepo.save(dailyTask);
-//
-//            user.getTasks().add(task);
-//            userService.saveUser(user);
-//
-//
-//        }
-//        catch (Exception e){
-//            System.out.println("Exception"+e);
-//            throw  new RuntimeException("An error occured while saving the task"+e);
-//        }
-//
-//
-//    }
+
 
 
     public Optional<DailyTask> getById(Long id){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return taskRepo.findById(id);
     }
 
 
     public void deleteTask(Long id){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     taskRepo.deleteById(id);
     }
+
 }

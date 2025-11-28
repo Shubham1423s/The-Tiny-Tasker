@@ -31,12 +31,13 @@ public class SecurityConfig {
           http
                   .csrf(csrf -> csrf.disable())
                   .authorizeHttpRequests(auth -> auth
-                          .requestMatchers( "/public/**","/HealthCheck").permitAll()
+                          .requestMatchers( "/public/**","/HealthCheck","/admin/**").permitAll()
                           .anyRequest().authenticated()
                   )
                   .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                  .formLogin(form -> form.disable())
                   .httpBasic(Customizer.withDefaults());
+
+
 
           return http.build();
 

@@ -24,7 +24,7 @@ public class User {
     private Long id;
 
     @NotBlank(message = "First Name  cannot be blank")
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private   String firstName;
 
     private   String lastName;

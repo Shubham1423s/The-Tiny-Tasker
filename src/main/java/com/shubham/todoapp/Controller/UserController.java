@@ -8,6 +8,9 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,11 +18,20 @@ import java.util.Objects;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/User")// so it can handle http requests
+@RequestMapping("/User")
 public class UserController {
 
+
+
     @Autowired
-    UserService userService;
+    private UserRepo userRepo;
+
+    @Autowired
+    private   UserService userService;
+
+
+
+
 
     @PostMapping("/Save")
     public ResponseEntity<UserResponse<User>> saveUser( @Valid @RequestBody User user){
@@ -28,20 +40,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new UserResponse<>(user,"User Created Successfully"));
     }
 
-    @DeleteMapping("/Delete/{id}")
-    public ResponseEntity<UserResponse<User>>deleteUserById(@PathVariable("id") Long id){
 
-        Optional<User> user = userService.getUser(id);
-        if(user.isPresent()){
-            userService.deleteUser(id);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new UserResponse<>(user.get(),"User Deleted Successfully"));
-        }
-        else{
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new UserResponse<>(null,"User Not Found"));
-
-        }
-    }
 
     @PutMapping("/UpdateUser/{id}")
     public ResponseEntity<UserResponse<User>> updateUserById(@RequestBody User user, @PathVariable("id") Long id ){
@@ -84,20 +83,42 @@ public class UserController {
 
 
     }
-    @GetMapping("/findByuserName/{name}")
-    public ResponseEntity<UserResponse<User>> getByUserNamee(@PathVariable ("name") String name){
+    @GetMapping("/find")
+    public ResponseEntity<UserResponse<User>> getByUserNamee(){
 
-    User user = userService.findByUserName(name);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String name = authentication.getName();
+        User user = userService.findByUserName(name);
 
         if(user != null ){
             return  ResponseEntity.status(HttpStatus.OK).body(new UserResponse<>(user,"user Found"));
-
-
 
         }else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new UserResponse<>(null,"User Not Found"));
 
         }
+
+    }
+
+    @DeleteMapping("/Delete")
+    public ResponseEntity<UserResponse<User>>deleteUserByUserName(){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+        userRepo.deleteByFirstName(userName);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new UserResponse<>(null,"user Deleted Successful"));
+    }
+    @DeleteMapping("/Delete/{id}")
+    public ResponseEntity<UserResponse<User>>deleteUserById(@PathVariable long id){
+        Optional<User> user  = userService.getUser(id);
+
+        if(!user.isPresent() ){
+            userService.deleteUser(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new UserResponse<>(user.get(),"User deleted Successfully"));
+
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new UserResponse<>(null,"User Not Found"));
+
 
     }
 

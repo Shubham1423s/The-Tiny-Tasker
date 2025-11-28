@@ -4,6 +4,8 @@ import com.shubham.todoapp.Entity.User;
 import com.shubham.todoapp.Repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,9 +36,16 @@ public class UserService {
     }
 
     public void saveUser(User user){
+
+
         userRepo.save(user);
     }
     public void saveNewUser(User user){
+
+        if(userRepo.existsByFirstName(user.getFirstName())){
+
+            throw new RuntimeException("Username already exists");
+        }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Arrays.asList("USER"));
