@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,8 +47,8 @@ public class TaskController {
     @GetMapping("/allTask")
     public ResponseEntity<TaskResponse<List<DailyTask>>> getAllTasks(){
 
-
         List<DailyTask>  allTasks = taskService.getAll();
+
         if(allTasks != null && !allTasks.isEmpty()){
             return  ResponseEntity.status(HttpStatus.OK).body(new TaskResponse<>(allTasks,"All Task Fetched Successfully"));
 
@@ -96,8 +97,6 @@ public class TaskController {
 
     @PostMapping("/saveTask")
     public ResponseEntity<TaskResponse<DailyTask>> createTask(@RequestBody DailyTask task){
-
-//        DailyTask dailyTask = taskService.saveTask(task);
 
        taskService.saveTask(task);
        return  ResponseEntity.status(HttpStatus.CREATED).body(new TaskResponse<>(task,"Task Created Successfully"));

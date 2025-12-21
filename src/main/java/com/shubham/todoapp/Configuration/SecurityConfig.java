@@ -8,6 +8,8 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,42 +20,63 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @Configuration
+//@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
+
+    private  final JwtFilter jwtFilter;
 
     private final UserDetailsServiceImpl userDetailsService;
 
-    public SecurityConfig(UserDetailsServiceImpl userDetailsService) {
+
+    public SecurityConfig(JwtFilter jwtFilter,UserDetailsServiceImpl userDetailsService) {
+
+        this.jwtFilter = jwtFilter;
         this.userDetailsService = userDetailsService;
     }
 
       @Bean
       public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+
           http
                   .csrf(csrf -> csrf.disable())
                   .authorizeHttpRequests(auth -> auth
-                          .requestMatchers( "/public/**","/HealthCheck","/admin/**").permitAll()
+                          .requestMatchers( "/signup","/login","/HealthCheck").permitAll()
                           .anyRequest().authenticated()
                   )
                   .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                  .httpBasic(Customizer.withDefaults());
-
-
+                  .authenticationProvider(authProvider());
+          http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
           return http.build();
 
+
       }
 
-   @Bean
-   public AuthenticationManager authenticationManager(HttpSecurity http) throws  Exception{
-       AuthenticationManagerBuilder builder =
-               http.getSharedObject(AuthenticationManagerBuilder.class);
+    @Bean
+    public DaoAuthenticationProvider authProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
 
-       builder
-               .userDetailsService(userDetailsService)
-               .passwordEncoder(passwordEncoder());
-       return builder.build();
+        return provider;
+    }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 
-   }
+
+//    @Bean
+//   public AuthenticationManager authenticationManager(HttpSecurity http) throws  Exception{
+//       AuthenticationManagerBuilder builder =
+//               http.getSharedObject(AuthenticationManagerBuilder.class);
+//
+//       builder
+//               .userDetailsService(userDetailsService)
+//               .passwordEncoder(passwordEncoder());
+//       return builder.build();
+//
+//   }
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();

@@ -37,15 +37,11 @@ public class User {
      private String email;
 
     @Column(nullable = false)
-//     private String role = "USER";// default role is  user
 
     private List<String> roles;
-     // here take string in place of list just to simple things later we can make changes as we need
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyTask> tasks = new ArrayList<>();
-
-
 
 }

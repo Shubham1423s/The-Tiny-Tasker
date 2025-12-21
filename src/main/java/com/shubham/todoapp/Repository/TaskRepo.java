@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface TaskRepo extends JpaRepository<DailyTask,Long> {
     List<DailyTask> findByUser(User user);
+    DailyTask   deleteByTitle(String Title);
 }

@@ -42,49 +42,31 @@ public class UserController {
 
 
 
-    @PutMapping("/UpdateUser/{id}")
-    public ResponseEntity<UserResponse<User>> updateUserById(@RequestBody User user, @PathVariable("id") Long id ){
+    @PutMapping("/UpdateUser")
+    public ResponseEntity<UserResponse<User>> updateUserById(@RequestBody User newUser ){
 
-      Optional<User> user1 = userService.getUser(id);
+        Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
 
-      if (user1.isPresent()) {
+        User userInDb = userService.findByUserName(userName);
 
-          User oldUser = user1.get();
-          oldUser.setFirstName(user.getFirstName());
-          oldUser.setEmail(user.getEmail());
-          oldUser.setLastName(user.getLastName());
+        if(userInDb != null){
+            userInDb.setFirstName(newUser.getFirstName());
+            userInDb.setPassword(newUser.getPassword());
 
-          userService.saveUser(oldUser);
-
-          return ResponseEntity.status(HttpStatus.OK).body(new UserResponse<>(user,"User Updated Successfully"));
-      }
-      else{
-          return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new UserResponse<>(null,"User Not Found"));
-
-      }
-
-    }
-
-
-
-    @GetMapping("/fetchUser/{id}")
-    public ResponseEntity<UserResponse<User>> getUserById(@PathVariable("id") Long id){
-
-        Optional<User> user = userService.getUser(id);
-
-        if(user.isPresent()){
-            return ResponseEntity.status(HttpStatus.OK).body(new UserResponse<>(user.get(),"User Found "));
+            userService.saveNewUser(userInDb);
+            return ResponseEntity.status(HttpStatus.OK).body(new UserResponse<>(newUser,"User Updated Successfully"));
 
         }
         else{
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new UserResponse<>(null,"User Not Found"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new UserResponse<>(null,"user Not found"));
+
         }
 
-
-
     }
+
     @GetMapping("/find")
-    public ResponseEntity<UserResponse<User>> getByUserNamee(){
+    public ResponseEntity<UserResponse<User>> getByUserName(){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String name = authentication.getName();
@@ -107,19 +89,6 @@ public class UserController {
         String userName = authentication.getName();
         userRepo.deleteByFirstName(userName);
         return ResponseEntity.status(HttpStatus.CREATED).body(new UserResponse<>(null,"user Deleted Successful"));
-    }
-    @DeleteMapping("/Delete/{id}")
-    public ResponseEntity<UserResponse<User>>deleteUserById(@PathVariable long id){
-        Optional<User> user  = userService.getUser(id);
-
-        if(!user.isPresent() ){
-            userService.deleteUser(id);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new UserResponse<>(user.get(),"User deleted Successfully"));
-
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new UserResponse<>(null,"User Not Found"));
-
-
     }
 
 }

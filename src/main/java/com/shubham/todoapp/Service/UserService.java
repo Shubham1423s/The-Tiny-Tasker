@@ -42,10 +42,10 @@ public class UserService {
     }
     public void saveNewUser(User user){
 
-        if(userRepo.existsByFirstName(user.getFirstName())){
-
-            throw new RuntimeException("Username already exists");
-        }
+//        if(userRepo.existsByFirstName(user.getFirstName())){
+//
+//            throw new RuntimeException("Username already exists");
+//        }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Arrays.asList("USER"));
@@ -53,6 +53,20 @@ public class UserService {
 
 
     }
+    public void saveNewAdmin(User user){
+
+        if(userRepo.existsByFirstName(user.getFirstName())){
+
+            throw new RuntimeException("Username already exists");
+        }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(Arrays.asList("Admin"));
+        userRepo.save(user);
+
+
+    }
+
     public User findByUserName(String firstName){
         return  userRepo.findByFirstName(firstName);
     }
